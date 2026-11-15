@@ -6,6 +6,7 @@ import '../core/theme.dart';
 import 'camera/main_camera_screen.dart';
 import 'collection/research_collection_screen.dart';
 import 'map/geographic_archive_map_screen.dart';
+import '../services/auth_service.dart';
 
 class NavigationWrapper extends StatefulWidget {
   const NavigationWrapper({super.key});
@@ -22,7 +23,7 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
     const ResearchCollectionScreen(),
     const GeographicArchiveMapScreen(),
     const Scaffold(body: Center(child: Text('History'))),
-    const Scaffold(body: Center(child: Text('Settings'))),
+    const _SettingsScreen(),
   ];
 
   @override
@@ -88,4 +89,20 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
       label: label,
     );
   }
+}
+
+class _SettingsScreen extends StatelessWidget {
+  const _SettingsScreen();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Settings')),
+        body: ListView(padding: const EdgeInsets.all(24), children: [
+          Text('Your field archive', style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: IRecognizeTheme.primary)),
+          const SizedBox(height: 8),
+          Text(AuthService().currentUser?.email ?? '', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: IRecognizeTheme.outline)),
+          const SizedBox(height: 24),
+          ListTile(leading: const Icon(Symbols.logout), title: const Text('Sign out'), onTap: () => AuthService().signOut()),
+        ]),
+      );
 }

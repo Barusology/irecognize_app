@@ -3,9 +3,41 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../core/theme.dart';
 import '../components/social_share_export_modal.dart';
 import 'dart:ui';
+import '../../models/identification.dart';
+import '../../services/identification_service.dart';
 
-class ObjectDetailViewScreen extends StatelessWidget {
-  const ObjectDetailViewScreen({super.key});
+class ObjectDetailViewScreen extends StatefulWidget {
+  const ObjectDetailViewScreen({super.key, this.entry});
+  final Identification? entry;
+
+  @override
+  State<ObjectDetailViewScreen> createState() => _ObjectDetailViewScreenState();
+}
+
+class _ObjectDetailViewScreenState extends State<ObjectDetailViewScreen> {
+  bool _saving = false;
+  bool _saved = false;
+  late final Identification _entry = widget.entry ?? Identification(
+    id: '',
+    title: 'Monstera Deliciosa',
+    category: 'BOTANY',
+    description: 'A flowering plant native to tropical forests from southern Mexico to Panama. Its distinctive split leaves help it thrive in low light beneath the forest canopy.',
+    imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBE48TOC6jV6JPPomQrq0GMyFDvdoDRvUE-eIMKqK2Fc0Nz-I4X_RPkDNmO7j4LFN0mUkdbXqsJlnarRwxvvBCzyBNffuBM2OOxP_9ENiIyYyRx1Vt1n5JtebTg3rPCa_Oke8v3OAvexnsrtl8CEuxYbUNPGpL-BEc-SXazhF_s5CMx_2m-eKIAZD09vXoS0Okek6_9RPaT1b4CVquhCSxr_WdsQsi34reDubQug5xlq9pMCTbXxwUtnx0cZn9ocUMqXmQFxb0ITi_I',
+    createdAt: DateTime.now(),
+    location: 'Los Angeles, CA',
+  );
+
+  Future<void> _saveEntry() async {
+    setState(() => _saving = true);
+    try {
+      await IdentificationService().save(_entry);
+      if (mounted) setState(() { _saved = true; _saving = false; });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your cloud archive.')));
+    } catch (error) {
+      if (mounted) setState(() => _saving = false);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not save this entry: $error')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +69,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
               child: const Icon(Symbols.ios_share, color: Colors.white, size: 20),
             ),
             onPressed: () {
-              showSocialShareExportModal(context);
+              showSocialShareExportModal(context, _entry);
             },
           ),
           IconButton(
@@ -63,7 +95,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: Image.network(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBE48TOC6jV6JPPomQrq0GMyFDvdoDRvUE-eIMKqK2Fc0Nz-I4X_RPkDNmO7j4LFN0mUkdbXqsJlnarRwxvvBCzyBNffuBM2OOxP_9ENiIyYyRx1Vt1n5JtebTg3rPCa_Oke8v3OAvexnsrtl8CEuxYbUNPGpL-BEc-SXazhF_s5CMx_2m-eKIAZD09vXoS0Okek6_9RPaT1b4CVquhCSxr_WdsQsi34reDubQug5xlq9pMCTbXxwUtnx0cZn9ocUMqXmQFxb0ITi_I',
+                    _entry.imageUrl,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -91,7 +123,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'BOTANY',
+                                _entry.category.toUpperCase(),
                                 style: IRecognizeTheme.lightTheme.textTheme.labelMedium?.copyWith(
                                   color: IRecognizeTheme.secondary,
                                   letterSpacing: 2.0,
@@ -101,7 +133,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Monstera Deliciosa',
+                            _entry.title,
                             style: IRecognizeTheme.lightTheme.textTheme.displayMedium?.copyWith(
                               fontSize: 56,
                               height: 1.0,
@@ -109,8 +141,8 @@ class ObjectDetailViewScreen extends StatelessWidget {
                               color: IRecognizeTheme.primary,
                             ),
                           ),
-                          const Text(
-                            '(Variegated)',
+                          if (_entry.title == 'Monstera Deliciosa') const Text(
+                            '(Field identification)',
                             style: TextStyle(
                               fontFamily: 'Newsreader',
                               fontStyle: FontStyle.italic,
@@ -129,7 +161,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildMetaBlock('LOCATION', 'Los Angeles, CA\n34.0522° N,\n118.2437° W'),
+                                    _buildMetaBlock('LOCATION', _entry.location),
                                     const SizedBox(height: 24),
                                     _buildMetaBlock('METHOD', 'AR Neural\nVision Engine'),
                                     const SizedBox(height: 24),
@@ -151,7 +183,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      'A species of flowering plant native to tropical forests of southern Mexico, south to Panama. The variegated form exhibits striking lack of chlorophyll in segments of its foliage.',
+                    _entry.description,
                                       style: IRecognizeTheme.lightTheme.textTheme.bodyMedium?.copyWith(
                                         height: 1.6,
                                         color: IRecognizeTheme.onSurfaceVariant,
@@ -190,7 +222,7 @@ class ObjectDetailViewScreen extends StatelessWidget {
             left: 24,
             right: 24,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: _saving || _saved ? null : _saveEntry,
               style: ElevatedButton.styleFrom(
                 backgroundColor: IRecognizeTheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -201,10 +233,10 @@ class ObjectDetailViewScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Symbols.edit_note, color: Colors.white),
+                  Icon(_saved ? Symbols.check : Symbols.bookmark_add, color: Colors.white),
                   const SizedBox(width: 12),
                   Text(
-                    'ADD FIELD NOTE',
+                    _saving ? 'SAVING TO ARCHIVE…' : _saved ? 'SAVED TO ARCHIVE' : 'SAVE TO MY ARCHIVE',
                     style: IRecognizeTheme.lightTheme.textTheme.labelMedium?.copyWith(
                       color: Colors.white,
                       letterSpacing: 2,

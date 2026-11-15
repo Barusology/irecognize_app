@@ -2,36 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class IRecognizeTheme {
-  static const Color background = Color(0xFFFBF9F4);
-  static const Color primary = Color(0xFF4E6073);
-  static const Color secondary = Color(0xFF26686A);
-  static const Color tertiary = Color(0xFF655E52);
+  static const Color background = Color(0xFF090A0C);
+  static const Color primary = Color(0xFFC9A66B);
+  static const Color secondary = Color(0xFF8DA99A);
+  static const Color tertiary = Color(0xFFD9C9A9);
   
-  static const Color surface = Color(0xFFFBF9F4);
-  static const Color surfaceDim = Color(0xFFD9DBCF);
-  static const Color surfaceContainerLow = Color(0xFFF5F4ED);
-  static const Color surfaceContainer = Color(0xFFEFEEE6);
-  static const Color surfaceContainerHigh = Color(0xFFE8E9E0);
-  static const Color surfaceContainerHighest = Color(0xFFE2E3D9);
-  static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFF111418);
+  static const Color surfaceDim = Color(0xFF090A0C);
+  static const Color surfaceContainerLow = Color(0xFF15191D);
+  static const Color surfaceContainer = Color(0xFF1A1F23);
+  static const Color surfaceContainerHigh = Color(0xFF22282C);
+  static const Color surfaceContainerHighest = Color(0xFF2B3235);
+  static const Color surfaceContainerLowest = Color(0xFF101315);
   
-  static const Color onSurface = Color(0xFF31332C);
-  static const Color onSurfaceVariant = Color(0xFF5E6058);
-  static const Color outline = Color(0xFF797C73);
-  static const Color outlineVariant = Color(0xFFB1B3A9);
+  static const Color onSurface = Color(0xFFF2EEE5);
+  static const Color onSurfaceVariant = Color(0xFFB5B0A5);
+  static const Color outline = Color(0xFFA49D90);
+  static const Color outlineVariant = Color(0xFF514F49);
   
-  static const Color primaryContainer = Color(0xFFD1E4FB);
-  static const Color onPrimaryContainer = Color(0xFF415366);
-  static const Color secondaryContainer = Color(0xFFAEEEF0);
-  static const Color onSecondaryContainer = Color(0xFF125B5D);
-  static const Color onPrimary = Color(0xFFF4F8FF);
+  static const Color primaryContainer = Color(0xFF3A3020);
+  static const Color onPrimaryContainer = Color(0xFFE8D3A8);
+  static const Color secondaryContainer = Color(0xFF27362E);
+  static const Color onSecondaryContainer = Color(0xFFD3E6D9);
+  static const Color onPrimary = Color(0xFF17140F);
   
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       scaffoldBackgroundColor: background,
       colorScheme: const ColorScheme(
-        brightness: Brightness.light,
+        brightness: Brightness.dark,
         primary: primary,
         onPrimary: onPrimary,
         primaryContainer: primaryContainer,

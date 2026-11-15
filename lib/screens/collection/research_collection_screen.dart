@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/theme.dart';
 import '../detail/object_detail_view_screen.dart';
+import '../../models/identification.dart';
+import '../../services/identification_service.dart';
 
 class ResearchCollectionScreen extends StatelessWidget {
   const ResearchCollectionScreen({super.key});
@@ -30,7 +32,7 @@ class ResearchCollectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '342 saved entries',
+                    'Your saved identifications',
                     style: IRecognizeTheme.lightTheme.textTheme.bodyMedium?.copyWith(
                       color: IRecognizeTheme.outline,
                     ),
@@ -52,26 +54,35 @@ class ResearchCollectionScreen extends StatelessWidget {
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 120), // Padding for nav bar
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 24.0,
-                crossAxisSpacing: 24.0,
-                childAspectRatio: 0.65,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return _ArchiveCard(
-                    title: _mockData[index]['title']!,
-                    category: _mockData[index]['category']!,
-                    date: _mockData[index]['date']!,
-                    imageUrl: _mockData[index]['imageUrl']!,
-                  );
-                },
-                childCount: _mockData.length,
-              ),
+          SliverToBoxAdapter(
+            child: StreamBuilder<List<Identification>>(
+              stream: IdentificationService().watchEntries(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Padding(padding: const EdgeInsets.all(24), child: Text('Archive unavailable: ${snapshot.error}', style: TextStyle(color: IRecognizeTheme.outline)));
+                }
+                if (!snapshot.hasData) return const Padding(padding: EdgeInsets.all(40), child: Center(child: CircularProgressIndicator()));
+                final entries = snapshot.data!;
+                if (entries.isEmpty) {
+                  return Padding(padding: const EdgeInsets.fromLTRB(28, 48, 28, 140), child: Column(children: [
+                    const Icon(Symbols.auto_awesome, size: 42, color: IRecognizeTheme.primary),
+                    const SizedBox(height: 16),
+                    Text('Your discoveries start here', textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 8),
+                    Text('Identify an object and save it to build your private field archive.', textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: IRecognizeTheme.outline)),
+                  ]));
+                }
+                return Padding(padding: const EdgeInsets.fromLTRB(24, 0, 24, 120), child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: entries.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 24, crossAxisSpacing: 24, childAspectRatio: .65),
+                  itemBuilder: (context, index) {
+                    final entry = entries[index];
+                    return _ArchiveCard(title: entry.title, category: entry.category, date: MaterialLocalizations.of(context).formatShortDate(entry.createdAt), imageUrl: entry.imageUrl, entry: entry);
+                  },
+                ));
+              },
             ),
           ),
         ],
@@ -134,12 +145,14 @@ class _ArchiveCard extends StatelessWidget {
   final String category;
   final String date;
   final String imageUrl;
+  final Identification entry;
 
   const _ArchiveCard({
     required this.title,
     required this.category,
     required this.date,
     required this.imageUrl,
+    required this.entry,
   });
 
   @override
@@ -152,7 +165,7 @@ class _ArchiveCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const ObjectDetailViewScreen(),
+            builder: (context) => ObjectDetailViewScreen(entry: entry),
           ),
         );
       },
@@ -219,29 +232,3 @@ class _ArchiveCard extends StatelessWidget {
   }
 }
 
-final List<Map<String, String>> _mockData = [
-  {
-    'title': 'Monstera Deliciosa (Variegated)',
-    'category': 'BOTANY',
-    'date': 'Oct 24, 2023',
-    'imageUrl': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBE48TOC6jV6JPPomQrq0GMyFDvdoDRvUE-eIMKqK2Fc0Nz-I4X_RPkDNmO7j4LFN0mUkdbXqsJlnarRwxvvBCzyBNffuBM2OOxP_9ENiIyYyRx1Vt1n5JtebTg3rPCa_Oke8v3OAvexnsrtl8CEuxYbUNPGpL-BEc-SXazhF_s5CMx_2m-eKIAZD09vXoS0Okek6_9RPaT1b4CVquhCSxr_WdsQsi34reDubQug5xlq9pMCTbXxwUtnx0cZn9ocUMqXmQFxb0ITi_I',
-  },
-  {
-    'title': 'Saint-Gervais Portal',
-    'category': 'ARCHITECTURE',
-    'date': 'Oct 22, 2023',
-    'imageUrl': 'https://lh3.googleusercontent.com/aida-public/AB6AXuCcUoZhyZymcq9Vj5iGYubyP0IZPAzdEUZyADTtcC0H5s0reuR4tIF602yaek02NoH-7lqb157GlpbCM78BwatJRatqJRfEg2M8C3lUHbUBAW7JmPC3bqikyWYgFta0lNYWDBgO9VLkLlbICPXMuXEUz8mBAcN7PNievhrI99poBoPPcSUOAwU8Uzem_jFhRquKaIMVLd_PclZC0NXvDl2zyZUQQoY-IiEfEyDP27qF0hiKrLn32fqJIKwMaCjPVG1RNOBW-m0pRirP',
-  },
-  {
-    'title': 'Bronze Winged Victory',
-    'category': 'SCULPTURE',
-    'date': 'Oct 15, 2023',
-    'imageUrl': 'invalid_url', // Will fallback to errorBuilder icon
-  },
-  {
-    'title': 'Ficus Elastica',
-    'category': 'BOTANY',
-    'date': 'Oct 10, 2023',
-    'imageUrl': 'invalid_url', // Will fallback to errorBuilder icon
-  }
-];

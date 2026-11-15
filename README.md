@@ -23,6 +23,9 @@ At its core, iRecognize is built around a simple idea: users capture or browse a
 - Material 3-based visual identity with editorial, museum-like styling
 - Structured sample data model for future integration with live repositories or APIs
 - Clean separation of UI, data, and application styling for maintainability
+- Firebase email/password sign-up and sign-in
+- Private, per-user identification archive in Cloud Firestore
+- Identification descriptions prepared for sharing through the device share menu
 
 ## Screens and Experience
 
@@ -31,6 +34,12 @@ At its core, iRecognize is built around a simple idea: users capture or browse a
 - Geographic archive map screen
 - Detail view for recorded objects
 - History and settings placeholder areas for future feature expansion
+
+### Cinematic camera concept
+
+![iRecognize camera screen mockup](docs/mockups/camera-screen.png)
+
+The [editable HTML mockup](docs/mockups/camera-screen.html) shows the visual direction; the PNG is its rendered screenshot.
 
 ## Tech Stack
 
@@ -69,6 +78,18 @@ At its core, iRecognize is built around a simple idea: users capture or browse a
 ```
 
 ## Getting Started
+
+### Firebase setup
+
+The Android and iOS Firebase registrations use the application/bundle ID `com.irecognize`. Keep `android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist` aligned with that ID if you change Firebase projects. In Firebase Console:
+
+1. Enable **Email/Password** under Authentication → Sign-in method.
+2. Create a Cloud Firestore database.
+3. Deploy the included `firestore.rules` before using the archive.
+
+The archive writes to `users/{uid}/identifications/{entryId}`. Never put Admin SDK credentials in the Flutter client; server-only integrations belong in a secured backend or Cloud Functions. Web and desktop targets need their own Firebase app registrations before Firebase initialization can run there.
+
+The camera and recognition result are currently prototype content. The detail screen demonstrates saving and sharing a sample Monstera identification; connect a camera and recognition provider to replace it with live results.
 
 ### Prerequisites
 

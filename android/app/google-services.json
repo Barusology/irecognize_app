@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "397166532177",
+    "project_id": "irecognize-5924b",
+    "storage_bucket": "irecognize-5924b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397166532177:android:4cf14e83d8874a0bbf4a70",
+        "android_client_info": {
+          "package_name": "com.irecognize"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY-KPLX5SzX04eeZpSrHXagHMCyZHohw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
