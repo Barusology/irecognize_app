@@ -52,13 +52,15 @@ class _FirebaseGateState extends State<_FirebaseGate> {
   @override
   void initState() {
     super.initState();
-    _initialization = Firebase.initializeApp();
+    if (!kIsWeb) _initialization = Firebase.initializeApp();
   }
 
   void _retry() => setState(() => _initialization = Firebase.initializeApp());
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<FirebaseApp>(
+  Widget build(BuildContext context) {
+    if (kIsWeb) return const _WebFirebaseSetupScreen();
+    return FutureBuilder<FirebaseApp>(
         future: _initialization,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -69,6 +71,46 @@ class _FirebaseGateState extends State<_FirebaseGate> {
           }
           return const _SessionGate();
         },
+      );
+  }
+}
+
+class _WebFirebaseSetupScreen extends StatelessWidget {
+  const _WebFirebaseSetupScreen();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 540),
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.web_asset_off, size: 48),
+                  const SizedBox(height: 16),
+                  Text('Web Firebase setup required', style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'This Firebase project has Android and iOS registrations, but no Web app config. To enable sign-in and the archive in Chrome, run this from the project folder and select Web:',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 14),
+                  SelectableText(
+                    'flutterfire configure --project=irecognize-5924b',
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Then initialize Firebase with DefaultFirebaseOptions.currentPlatform from the generated lib/firebase_options.dart file.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       );
 }
 
